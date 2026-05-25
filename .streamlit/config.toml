@@ -1,0 +1,15 @@
+[theme]
+# Color del botón principal y elementos destacados
+primaryColor = "#FF4B4B"
+
+# Color de fondo de la web
+backgroundColor = "#FFFFFF"
+
+# Color de fondo secundario (para menús o tablas)
+secondaryBackgroundColor = "#F0F2F6"
+
+# Color del texto
+textColor = "#31333F"
+
+# Tipografía (opciones: "sans serif", "serif", "monospace")
+font = "sans serif"
