@@ -6,14 +6,13 @@ import normativa
 import geotecnia
 import hormigon
 
-# 1. Configuración de la página (Modo Pantalla Completa)
+# 1. Configuración de la página
 st.set_page_config(page_title="Acero y Código | Muros", layout="wide", initial_sidebar_state="collapsed")
 
 # 2. Cabecera con Logo y Título
 col_logo, col_titulo = st.columns([1, 5])
 with col_logo:
     try:
-        # El programa buscará esta imagen. Luego te enseño a subirla.
         st.image("logo.png", use_container_width=True)
     except:
         st.info("Espacio para LOGO")
@@ -27,7 +26,6 @@ st.divider()
 # 3. Panel Central (Bloques Horizontales)
 st.markdown("### 🛠️ Parámetros de Entrada")
 
-# Magia de Streamlit: En PC son 3 columnas horizontales. En móvil se apilan verticalmente solas.
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -57,7 +55,6 @@ with col_btn2:
     ejecutar = st.button("🚀 Ejecutar Cálculo Normativo", type="primary", use_container_width=True)
 
 if ejecutar:
-    # Simulación de extracción de datos de nuestros módulos backend
     estratos = [{"espesor": h_muro, "phi": phi, "c": c_cohesion, "gamma": gamma_terr}]
     
     with st.spinner('Iterando matriz de combinaciones ELU/ELS...'):
@@ -88,12 +85,35 @@ if ejecutar:
         col_res2.error(f"❌ CS Desliz: {res_estab['CS_Deslizamiento']} < 1.50")
         
     if res_flex["Cumple"]:
-        col_res3.success(f"✔️ Acero: Propuesto {as_propuesto} cm2 ≥ Req {res_flex['As_Definitivo_Requerido']} cm2")
+        col_res3.success(f"✔️ Acero: Propuesto {as_propuesto} cm² ≥ Req {res_flex['As_Definitivo_Requerido']} cm²")
     else:
-        col_res3.error(f"❌ Acero Insuficiente: Mínimo {res_flex['As_Definitivo_Requerido']} cm2")
+        col_res3.error(f"❌ Acero Insuficiente: Mínimo {res_flex['As_Definitivo_Requerido']} cm²")
 
-    st.divider()
-    
     # Alerta inteligente
     if res_flex["Alerta_Canto"] != "OK":
         st.warning(f"⚠️ Aviso Estructural: {res_flex['Alerta_Canto']}")
+
+    st.divider()
+    
+    # 6. MEMORIA DE CÁLCULO (Modo Tonto / Educativo)
+    st.markdown("### 📄 Memoria de Cálculo Detallada")
+    
+    with st.expander("Ver justificación paso a paso", expanded=False):
+        
+        st.markdown("#### 1. Cálculo de Empujes (Geotecnia)")
+        st.markdown("Desglose de las presiones efectivas del terreno en el trasdós del muro:")
+        st.dataframe(presiones, use_container_width=True)
+        
+        st.markdown("#### 2. Comprobaciones de Estabilidad (ELS)")
+        st.markdown(f"**Momento Estabilizador ($M_{{est}}$):** {round(m_est, 2)} kN·m")
+        st.markdown(f"**Momento Desestabilizador ($M_{{des}}$):** {round(m_des, 2)} kN·m")
+        
+        # Fórmula en LaTeX
+        st.latex(r"CS_{vuelco} = \frac{M_{est}}{M_{des}} = \frac{" + str(round(m_est,2)) + "}{" + str(round(m_des,2)) + "} = " + str(round(res_estab['CS_Vuelco'], 2)))
+        
+        st.markdown("#### 3. Dimensionamiento a Flexión (ELU)")
+        st.markdown(f"**Momento de Diseño Mayorado ($M_{{Ed}}$):** {round(m_ed_base, 2)} kN·m")
+        st.markdown(f"**Armadura estrictamente necesaria por cálculo:** {res_flex['As_Calculo_Puro_cm2']} cm²/m")
+        st.markdown(f"**Armadura mínima geométrica normativa:** {res_flex['As_Minimo_Norma_cm2']} cm²/m")
+        
+        st.info("💡 **Nota Normativa:** El Código Estructural exige adoptar el valor máximo entre el cálculo puro y los mínimos geométricos para garantizar la ductilidad de la sección y evitar roturas frágiles.")
