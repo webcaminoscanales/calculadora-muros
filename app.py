@@ -67,7 +67,7 @@ if ejecutar:
         m_ed_base = m_des * 1.35 
         
         res_estab = hormigon.comprobar_estabilidad(m_est, m_des, f_roce, f_desliza)
-        res_flex = hormigon.verificar_cuantia_flexion(m_ed_base, 1.0, b_zapata-0.05, fck, fyk, as_propuesto)
+        res_flex = hormigon.verificar_cuantia_flexion(m_ed_base, 1.0, canto_zapata-0.05, fck, fyk, as_propuesto)
 
     # 5. Salida de Resultados (El Dashboard de Mando)
     st.subheader("📊 Envolventes Críticas y Estabilidad")
